@@ -28,7 +28,7 @@ struct characterStats{
 } thisCharacter;
 
 /* Standard class modifiers */
-enum class { 
+enum charClass { 
 	wizard,
 	fighter,
 	seductress,
@@ -52,6 +52,8 @@ struct characterSpecials {
 	int eyecolor;
 	int height;
 };
+
+void drawStats (struct characterStats *);
 
 int main (void) {
 
@@ -133,6 +135,10 @@ void buildCharacter (struct characterStats *thisCharacter) {
 	thisCharacter->strength = rollDice(thisCharacter, 1);
 	thisCharacter->charisma = rollDice(thisCharacter, 1);
 
+}
+void drawStats (struct characterStats *thisCharacter) {
+	clrscr();
+	// bgcolor("black");
 }
 
 

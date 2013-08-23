@@ -6,14 +6,13 @@ CC65_TOOLS=$(CC65)\wbin
  
 BUILDDIR=$(MAKEDIR)\$(BUILD)
 ODIR=$(MAKEDIR)\obj
- 
-
-
+  
 .SUFFIXES : .c .s .o .asm .bmp .pal .spr
 .SOURCE : 
  
 # Compiling for Atari 8-Bit system
 SYS=atari
+
  
 # Names of tools
 CO=co65
@@ -27,6 +26,7 @@ RM=rm
 ECHO=echo
 TOUCH=touch
 MV=mv
+RMDIR=$(CC65_TOOLS)\rmdir
  
 CODE_SEGMENT=CODE
 DATA_SEGMENT=DATA
