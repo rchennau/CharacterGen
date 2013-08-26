@@ -36,12 +36,10 @@ enum charClass {
 };
 
 /* Standard race modifiers */
-enum race { 
-	elf,
-	human,
-	dwarf,
-	planes
-};
+int elf[7] = {1,3,2,0,2,5,14};
+int dwarf[7] = {1,-1,1,2,2,5,14};
+int human[7] = {0,0,0,0,0,6,14};
+int planes[7] = {2,2,0,-2,-2,3,14};
 
 /* Seed the randomizer prototype */
 void randomizer (void);
@@ -59,11 +57,37 @@ int main (void) {
 
 	char c;
 	char accept[2];
-	
-	thisCharacter.floor = 4;
-	thisCharacter.max = 14;
-
+	int race;
+		
 	printf("Generating random stats.\n");
+	printf("Choose a race ( [1] elf, [2] human, [3] dwarf, [4] planes ) : ");
+	scanf("%1i", &race);
+
+	printf("Race = %i\n", race);
+
+	switch (race) {
+		
+		case 1:
+			thisCharacter.floor = elf[5];
+			thisCharacter.max = elf[6];
+			break;
+		case 2:
+			thisCharacter.floor = dwarf[5];
+			thisCharacter.max = dwarf[6];
+			break;
+		case 3:
+			thisCharacter.floor = human[5];
+			thisCharacter.max = human[6];
+			break;
+		case 4:
+			thisCharacter.floor = planes[5];
+			thisCharacter.max = planes[6];
+			break;
+		default:
+			printf("No choice made assignign human\n");
+			break;
+	}
+
 	randomizer();
 	while(1) {
 		buildCharacter(&thisCharacter);
@@ -83,6 +107,7 @@ int main (void) {
 		}
 	}
 	
+	  
 	printf("Press any character to exit\n");
 
 	while (1) {
@@ -137,7 +162,7 @@ void buildCharacter (struct characterStats *thisCharacter) {
 
 }
 void drawStats (struct characterStats *thisCharacter) {
-	clrscr();
+	// clrscr();
 	// bgcolor("black");
 }
 
