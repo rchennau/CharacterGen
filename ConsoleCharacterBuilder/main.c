@@ -17,7 +17,7 @@ void buildCharacter (struct characterStats * );
 int fileOps(char);
 
 /* Standard character stats */
-struct characterStats{
+typedef struct characterStats{
 	int wisdom;
 	int intelligence;
 	int dexterity;
@@ -25,7 +25,7 @@ struct characterStats{
 	int charisma;
 	int floor;
 	int max;
-} thisCharacter;
+}CHARACTER;
 
 /* Standard class modifiers */
 enum charClass { 
@@ -36,8 +36,8 @@ enum charClass {
 };
 
 /* Standard race modifiers */
-int elf[7] = {1,3,2,0,2,5,14};
-int dwarf[7] = {1,-1,1,2,2,5,14};
+int elf[7] = {2,1,2,0,2,5,14};
+int dwarf[7] = {1,-1,1,2,2,6,14};
 int human[7] = {0,0,0,0,0,6,14};
 int planes[7] = {2,2,0,-2,-2,3,14};
 
@@ -53,50 +53,39 @@ struct characterSpecials {
 
 void drawStats (struct characterStats *);
 
+/* Function addRaceModifiers add the standard race modifiers to the character stats as part of the build character process. 
+*  The function takes two parameters.  A pointer to the int race (declared in main) and pointer to the structure characterStats.
+*  The purpose of the function was to ensure that the characterStats were reset with each die roll and the modifiers readded. 
+*  The pointers serve as a means of optimization for the limited 8-bit machines 
+*/
+void addRaceModifiers (int *, struct characterStats *);
+
 int main (void) {
 
 	char c;
 	char accept[2];
 	int race;
-		
+	CHARACTER *thisCharacter;
+	/* zero fill the memory space for thisCharacter */
+	thisCharacter = (CHARACTER *) calloc(7, sizeof(CHARACTER));
+
+	/* Seed the randomizer */
+	randomizer();
+
 	printf("Generating random stats.\n");
 	printf("Choose a race ( [1] elf, [2] human, [3] dwarf, [4] planes ) : ");
 	scanf("%1i", &race);
 
-	printf("Race = %i\n", race);
-
-	switch (race) {
-		
-		case 1:
-			thisCharacter.floor = elf[5];
-			thisCharacter.max = elf[6];
-			break;
-		case 2:
-			thisCharacter.floor = dwarf[5];
-			thisCharacter.max = dwarf[6];
-			break;
-		case 3:
-			thisCharacter.floor = human[5];
-			thisCharacter.max = human[6];
-			break;
-		case 4:
-			thisCharacter.floor = planes[5];
-			thisCharacter.max = planes[6];
-			break;
-		default:
-			printf("No choice made assignign human\n");
-			break;
-	}
-
-	randomizer();
 	while(1) {
-		buildCharacter(&thisCharacter);
+		
+		addRaceModifiers(&race, thisCharacter);
+		buildCharacter(thisCharacter);
 
-		printf("Wis : %d\n", thisCharacter.wisdom);
-		printf("Int : %d\n", thisCharacter.intelligence);
-		printf("Dex : %d\n", thisCharacter.dexterity);
-		printf("Str : %d\n", thisCharacter.strength);
-		printf("Cha : %d\n", thisCharacter.charisma);
+		printf("Wis : %d\n", thisCharacter->wisdom);
+		printf("Int : %d\n", thisCharacter->intelligence);
+		printf("Dex : %d\n", thisCharacter->dexterity);
+		printf("Str : %d\n", thisCharacter->strength);
+		printf("Cha : %d\n", thisCharacter->charisma);
 
 		printf("Do you accept? [Y/N] ");
 		
@@ -107,7 +96,6 @@ int main (void) {
 		}
 	}
 	
-	  
 	printf("Press any character to exit\n");
 
 	while (1) {
@@ -122,6 +110,37 @@ int main (void) {
 	}
 
 	return 0;
+}
+
+
+
+void addRaceModifiers (int *race, struct characterStats *thisCharacter) {
+	switch (*race) {
+		
+		case 1:
+			thisCharacter->wisdom = elf[0];
+			thisCharacter->floor = elf[5];
+			thisCharacter->max = elf[6];
+			break;
+		case 2:
+			thisCharacter->wisdom = dwarf[0];
+			thisCharacter->floor = dwarf[5];
+			thisCharacter->max = dwarf[6];
+			break;
+		case 3:
+			thisCharacter->wisdom = human[0];
+			thisCharacter->floor = human[5];
+			thisCharacter->max = human[6];
+			break;
+		case 4:
+			thisCharacter->wisdom = planes[0];
+			thisCharacter->floor = planes[5];
+			thisCharacter->max = planes[6];
+			break;
+		default:
+			printf("No choice made; assigning human\n");
+			break;
+	}
 }
 
 /* In order to pass by reference a structure to a function you must define the type 'struct' with its tag (or name) and 
@@ -154,13 +173,13 @@ int rollDice (struct characterStats *thisCharacter, int numOfRolls) {
 
 void buildCharacter (struct characterStats *thisCharacter) {
 
-	thisCharacter->wisdom = rollDice(thisCharacter, 1);
+	thisCharacter->wisdom = rollDice(thisCharacter, 1) + thisCharacter->wisdom;
 	thisCharacter->intelligence = rollDice(thisCharacter, 1);
 	thisCharacter->dexterity = rollDice(thisCharacter, 1);
 	thisCharacter->strength = rollDice(thisCharacter, 1);
 	thisCharacter->charisma = rollDice(thisCharacter, 1);
-
 }
+
 void drawStats (struct characterStats *thisCharacter) {
 	// clrscr();
 	// bgcolor("black");
