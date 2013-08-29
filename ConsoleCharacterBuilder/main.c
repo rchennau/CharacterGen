@@ -112,8 +112,6 @@ int main (void) {
 	return 0;
 }
 
-
-
 void addRaceModifiers (int *race, struct characterStats *thisCharacter) {
 	switch (*race) {
 		
