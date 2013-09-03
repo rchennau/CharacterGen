@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <conio.h>
+#include <time.h>
 
 #ifdef __ATARI__
 #include <peekpoke.h>
@@ -63,8 +64,9 @@ void addRaceModifiers (int *, struct characterStats *);
 int main (void) {
 
 	char c;
-	char accept[2];
+	char accept[2] = "0";
 	int race;
+	int total;
 	CHARACTER *thisCharacter;
 	/* zero fill the memory space for thisCharacter */
 	thisCharacter = (CHARACTER *) calloc(7, sizeof(CHARACTER));
@@ -80,19 +82,23 @@ int main (void) {
 		
 		addRaceModifiers(&race, thisCharacter);
 		buildCharacter(thisCharacter);
+				
+		total = thisCharacter->wisdom + thisCharacter->intelligence + thisCharacter->dexterity + thisCharacter->strength + thisCharacter->charisma;
 
-		printf("Wis : %d\n", thisCharacter->wisdom);
-		printf("Int : %d\n", thisCharacter->intelligence);
-		printf("Dex : %d\n", thisCharacter->dexterity);
-		printf("Str : %d\n", thisCharacter->strength);
-		printf("Cha : %d\n", thisCharacter->charisma);
+		while (total >= 65) {
+			// printf("Total %i\n", total);
+			printf("Wis : %d\n", thisCharacter->wisdom);
+			printf("Int : %d\n", thisCharacter->intelligence);
+			printf("Dex : %d\n", thisCharacter->dexterity);
+			printf("Str : %d\n", thisCharacter->strength);
+			printf("Cha : %d\n", thisCharacter->charisma);
 
-		printf("Do you accept? [Y/N] ");
-		
-		scanf("%s", accept);
-		if (strcmp(accept, "Y") == 0) {
-			printf("Accept == %s \n", accept);
-			break;
+			printf("Do you accept? [Y/N] ");
+			scanf("%s", accept);
+			if (strcmp(accept, "Y")) {
+				printf("Accept == %s \n", accept);
+				break;
+			}
 		}
 	}
 	
@@ -148,7 +154,7 @@ void randomizer (void) {
 	#ifdef __ATARI__
 		srand(PEEK(53770));
 	#else
-		srand(time(0));  
+		srand(time(NULL)); 
 	#endif
 
 	return;
@@ -170,12 +176,13 @@ int rollDice (struct characterStats *thisCharacter, int numOfRolls) {
 }
 
 void buildCharacter (struct characterStats *thisCharacter) {
-
-	thisCharacter->wisdom = rollDice(thisCharacter, 1) + thisCharacter->wisdom;
-	thisCharacter->intelligence = rollDice(thisCharacter, 1);
-	thisCharacter->dexterity = rollDice(thisCharacter, 1);
-	thisCharacter->strength = rollDice(thisCharacter, 1);
-	thisCharacter->charisma = rollDice(thisCharacter, 1);
+	
+		thisCharacter->wisdom = rollDice(thisCharacter, 1) + thisCharacter->wisdom;
+		thisCharacter->intelligence = rollDice(thisCharacter, 1);
+		thisCharacter->dexterity = rollDice(thisCharacter, 1);
+		thisCharacter->strength = rollDice(thisCharacter, 1);
+		thisCharacter->charisma = rollDice(thisCharacter, 1);
+		
 }
 
 void drawStats (struct characterStats *thisCharacter) {
