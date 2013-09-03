@@ -29,11 +29,11 @@ typedef struct characterStats{
 }CHARACTER;
 
 /* Standard class modifiers */
-enum charClass { 
-	wizard,
-	fighter,
-	seductress,
-	cleric
+enum charClass_t { 
+	wizard_int,
+	fighter_str,
+	seductress_cha,
+	cleric_wis
 };
 
 /* Standard race modifiers */
@@ -84,21 +84,22 @@ int main (void) {
 		buildCharacter(thisCharacter);
 				
 		total = thisCharacter->wisdom + thisCharacter->intelligence + thisCharacter->dexterity + thisCharacter->strength + thisCharacter->charisma;
-
-		while (total >= 65) {
-			// printf("Total %i\n", total);
+	
+		if (total >= 65) {
+			printf("Total %i\n", total);
 			printf("Wis : %d\n", thisCharacter->wisdom);
 			printf("Int : %d\n", thisCharacter->intelligence);
 			printf("Dex : %d\n", thisCharacter->dexterity);
 			printf("Str : %d\n", thisCharacter->strength);
 			printf("Cha : %d\n", thisCharacter->charisma);
 
-			printf("Do you accept? [Y/N] ");
+			printf("Do you accept, reroll or previous? [1] Accept, [2] Reroll, [3] Previous");
 			scanf("%s", accept);
-			if (strcmp(accept, "Y")) {
+			if (strcmp(accept, "Y") == 0) {
 				printf("Accept == %s \n", accept);
 				break;
 			}
+		printf("Reroll : %i\n", total);
 		}
 	}
 	
@@ -189,12 +190,4 @@ void drawStats (struct characterStats *thisCharacter) {
 	// clrscr();
 	// bgcolor("black");
 }
-
-
-	
-
-
-
-
-
 
