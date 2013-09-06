@@ -9,15 +9,16 @@
 #endif
 
 /* rollDice prototype for rolling the dice */
-int rollDice (struct characterStats *, int);
+char rollDice (struct characterStats *, char);
 
 /*build Character */
 void buildCharacter (struct characterStats * );
 
 /* file operations prototype */
-int fileOps(char);
+char fileOps(char);
 
-/* Standard character stats */
+/*Standard character stats 
+* proto code to build as a linked list and only store 10 sets of stats */
 typedef struct characterStats{
 	int wisdom;
 	int intelligence;
@@ -26,7 +27,11 @@ typedef struct characterStats{
 	int charisma;
 	int floor;
 	int max;
+	// struct characterStats *next;
 }CHARACTER;
+
+/* proto code to initalize the head of the linked list of characterStats */
+// struct characterStatus *head = NULL;
 
 /* Standard class modifiers */
 enum charClass_t { 
@@ -37,10 +42,10 @@ enum charClass_t {
 };
 
 /* Standard race modifiers */
-int elf[7] = {2,1,2,0,2,5,14};
-int dwarf[7] = {1,-1,1,2,2,6,14};
-int human[7] = {0,0,0,0,0,6,14};
-int planes[7] = {2,2,0,-2,-2,3,14};
+char elf[7] = {2,1,2,0,2,5,14};
+char dwarf[7] = {1,-1,1,2,2,6,14};
+char human[7] = {0,0,0,0,0,6,14};
+char planes[7] = {2,2,0,-2,-2,3,14};
 
 /* Seed the randomizer prototype */
 void randomizer (void);
@@ -59,19 +64,30 @@ void drawStats (struct characterStats *);
 *  The purpose of the function was to ensure that the characterStats were reset with each die roll and the modifiers readded. 
 *  The pointers serve as a means of optimization for the limited 8-bit machines 
 */
-void addRaceModifiers (int *, struct characterStats *);
 
-int main (void) {
+void addRaceModifiers (unsigned char *, struct characterStats *);
 
-	char c;
+char main (void) {
+
+	unsigned char c;
+	
 	char accept[2] = "0";
-	int race;
-	int total;
+		
+	unsigned char race;
+	unsigned char total;
+
 	CHARACTER *thisCharacter;
-	/* zero fill the memory space for thisCharacter */
+
+	// proto code for characterStats linked list 
+	 struct characterStats *tempCharStats;
+	 tempCharStats = (struct characterStats *)calloc(8, sizeof(struct characterStats));
+
+
+
+	// zero fill the memory space for thisCharacter 
 	thisCharacter = (CHARACTER *) calloc(7, sizeof(CHARACTER));
 
-	/* Seed the randomizer */
+	// Seed the randomizer 
 	randomizer();
 
 	printf("Generating random stats.\n");
@@ -82,11 +98,15 @@ int main (void) {
 		
 		addRaceModifiers(&race, thisCharacter);
 		buildCharacter(thisCharacter);
-				
+	
+		printf("SizeOf struct thisCharacter = %d\n", sizeof(thisCharacter));
+		printf("SizeOf int race = %d\n", sizeof(race));
+		printf("SizeOf char c = %d\n", sizeof(c));
+
 		total = thisCharacter->wisdom + thisCharacter->intelligence + thisCharacter->dexterity + thisCharacter->strength + thisCharacter->charisma;
 	
 		if (total >= 65) {
-			printf("Total %i\n", total);
+			// printf("Total %i\n", total);
 			printf("Wis : %d\n", thisCharacter->wisdom);
 			printf("Int : %d\n", thisCharacter->intelligence);
 			printf("Dex : %d\n", thisCharacter->dexterity);
@@ -95,11 +115,27 @@ int main (void) {
 
 			printf("Do you accept, reroll or previous? [1] Accept, [2] Reroll, [3] Previous");
 			scanf("%s", accept);
+
+			/*
+			* switch (choice) {
+			* case 1:
+				break;
+			* case 2:
+				;
+			* case 3:
+				printf("Wis : %d\n", thisCharacter->wisdom);
+				printf("Int : %d\n", thisCharacter->intelligence);
+				printf("Dex : %d\n", thisCharacter->dexterity);
+				printf("Str : %d\n", thisCharacter->strength);
+				printf("Cha : %d\n", thisCharacter->charisma);
+				break;
+			*/
 			if (strcmp(accept, "Y") == 0) {
 				printf("Accept == %s \n", accept);
 				break;
 			}
-		printf("Reroll : %i\n", total);
+		// printf("Reroll : %i\n", total);
+
 		}
 	}
 	
@@ -119,7 +155,8 @@ int main (void) {
 	return 0;
 }
 
-void addRaceModifiers (int *race, struct characterStats *thisCharacter) {
+
+void addRaceModifiers (unsigned char *race, struct characterStats *thisCharacter) {
 	switch (*race) {
 		
 		case 1:
@@ -162,10 +199,10 @@ void randomizer (void) {
 	
 }
 
-int rollDice (struct characterStats *thisCharacter, int numOfRolls) {
-	int x = numOfRolls;
-	int i, final = 0;
-	int roll;
+char rollDice (struct characterStats *thisCharacter, char numOfRolls) {
+	unsigned char x = numOfRolls;
+	unsigned char i, final = 0;
+	unsigned char roll;
 	for (i = 0; i < x; i++) {
 		roll = rand()%thisCharacter->max + thisCharacter->floor;
 				
