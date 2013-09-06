@@ -43,7 +43,7 @@ SEGMENTS=--code-name $(CODE_SEGMENT) \
 AFLAGS=
  
 # Flags for C-code compiler
-CFLAGS=-I . -t $(SYS) --add-source -O -Or -Cl -Os 
+CFLAGS=-I . -t $(SYS) --add-source -O -Or -Cl -Os -v
  
 # Rule for making a *.o file out of a *.s file
 .s.o:
@@ -51,8 +51,8 @@ CFLAGS=-I . -t $(SYS) --add-source -O -Or -Cl -Os
  
 # Rule for making a *.o file out of a *.c file
 .c.o:
-  $(CC) $(SEGMENTS) $(CFLAGS) $<
-  $(AS) -o $@ $(AFLAGS) $(*).s
+  $(CC) -v $(SEGMENTS) $(CFLAGS) $<
+  $(AS) -v -o $@ $(AFLAGS) $(*).s
  
 ataristd.o:
   $(CP) $(CC65_INC)\..\joy\$*.joy .

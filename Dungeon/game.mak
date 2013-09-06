@@ -4,7 +4,7 @@ target = AtariTemplate.xex
 # objects = atari4.o ataristd.o 
 
 $(target) : $(objects)
-	$(CL) -t $(SYS) -o $@ $(objects) --ld-args -D,__RESERVED_MEMORY__=15339 main.c
+	$(CL) -l as.s -v -t $(SYS) -O -Or -Cl -Os -o $@ $(objects)  main.c
 	$(MV) $@ .\$(BUILD)\$@
  
 all: $(target)
