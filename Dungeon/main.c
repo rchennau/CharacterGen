@@ -7,6 +7,7 @@
 #ifdef __ATARI__
 #include <peekpoke.h>
 #endif
+typedef unsigned char byte;
 
 /* rollDice prototype for rolling the dice */
 char rollDice (struct characterStats *, char);
@@ -20,13 +21,13 @@ char fileOps(char);
 /*Standard character stats 
 * proto code to build as a linked list and only store 10 sets of stats */
 typedef struct characterStats{
-	int wisdom;
-	int intelligence;
-	int dexterity;
-	int strength;
-	int charisma;
-	int floor;
-	int max;
+	unsigned char wisdom;
+	unsigned char intelligence;
+	unsigned char dexterity;
+	unsigned char strength;
+	unsigned char charisma;
+	unsigned char floor;
+	unsigned char max;
 	// struct characterStats *next;
 }CHARACTER;
 
@@ -34,12 +35,14 @@ typedef struct characterStats{
 // struct characterStatus *head = NULL;
 
 /* Standard class modifiers */
-enum charClass_t { 
-	wizard_int,
-	fighter_str,
-	seductress_cha,
-	cleric_wis
+union MyClassModifiers
+{
+	char wizard[7];
+	char figher[7];
+	char seducer[7];
+	char cleric[7];
 };
+
 
 /* Standard race modifiers */
 char elf[7] = {2,1,2,0,2,5,14};
@@ -60,32 +63,32 @@ struct characterSpecials {
 void drawStats (struct characterStats *);
 
 /* Function addRaceModifiers add the standard race modifiers to the character stats as part of the build character process. 
-*  The function takes two parameters.  A pointer to the int race (declared in main) and pointer to the structure characterStats.
+*  The function takes two parameters.  A pointer to the char race (declared in main) and pointer to the structure characterStats.
 *  The purpose of the function was to ensure that the characterStats were reset with each die roll and the modifiers readded. 
 *  The pointers serve as a means of optimization for the limited 8-bit machines 
 */
-
-void addRaceModifiers (unsigned char *, struct characterStats *);
+void addRaceModifiers (byte *, struct characterStats *);
 
 char main (void) {
 
-	unsigned char c;
+	byte c;
 	
 	char accept[2] = "0";
 		
-	unsigned char race;
+	byte race;
 	unsigned char total;
 
 	CHARACTER *thisCharacter;
 
-	// proto code for characterStats linked list 
+	/* proto code for characterStats linked list 
 	 struct characterStats *tempCharStats;
 	 tempCharStats = (struct characterStats *)calloc(8, sizeof(struct characterStats));
+	*/
 
-
-
+	/* Removed: malloc, calloc and alloc on the atari platform at it is resource intensive
 	// zero fill the memory space for thisCharacter 
-	thisCharacter = (CHARACTER *) calloc(7, sizeof(CHARACTER));
+	// thisCharacter = (CHARACTER *) calloc(7, sizeof(CHARACTER));
+	*/
 
 	// Seed the randomizer 
 	randomizer();
@@ -98,10 +101,6 @@ char main (void) {
 		
 		addRaceModifiers(&race, thisCharacter);
 		buildCharacter(thisCharacter);
-	
-		printf("SizeOf struct thisCharacter = %d\n", sizeof(thisCharacter));
-		printf("SizeOf int race = %d\n", sizeof(race));
-		printf("SizeOf char c = %d\n", sizeof(c));
 
 		total = thisCharacter->wisdom + thisCharacter->intelligence + thisCharacter->dexterity + thisCharacter->strength + thisCharacter->charisma;
 	
@@ -156,7 +155,7 @@ char main (void) {
 }
 
 
-void addRaceModifiers (unsigned char *race, struct characterStats *thisCharacter) {
+void addRaceModifiers (byte *race, struct characterStats *thisCharacter) {
 	switch (*race) {
 		
 		case 1:
