@@ -4,35 +4,32 @@
 #include <conio.h>
 #include <time.h>
 
+// Characeter defines 
+// #define CHARACTER_STAT_MAX		// maximum value for a stat. 
+// #define CHARACTER_STAT_FLOOR	// minimum value for of a stat
+// #define CHARACTER_STAT_WIS		// define to hold the wisdom stat for selected character
+// #define CHARACTER_STAT_INT
+// #define CHARACTER_STAT_DEX
+// #define CHARACTER_STAT_STR
+// #define CHARACTER_STAT_CHA
+#define CHARACTER_STAT_ARR 7	// Size of Stat array
+#define CHARACTER_STAT_NUM 5	// number of character stats (good for iterating over each stat)
+
+#define RACES_INDEX 4			// size of array for all races [0...n]
+
 #ifdef __ATARI__
 #include <peekpoke.h>
 #endif
+
+/* On the Atari platform an int = 2 byte's while a char occupies a single byte.  
+** Furthermore t
+*/
 typedef unsigned char byte;
 
-/* rollDice prototype for rolling the dice */
-char rollDice (struct characterStats *, char);
-
-/*build Character */
-void buildCharacter (struct characterStats * );
+char rollDice (char* array,byte);
 
 /* file operations prototype */
-char fileOps(char);
-
-/*Standard character stats 
-* proto code to build as a linked list and only store 10 sets of stats */
-typedef struct characterStats{
-	unsigned char wisdom;
-	unsigned char intelligence;
-	unsigned char dexterity;
-	unsigned char strength;
-	unsigned char charisma;
-	unsigned char floor;
-	unsigned char max;
-	// struct characterStats *next;
-}CHARACTER;
-
-/* proto code to initalize the head of the linked list of characterStats */
-// struct characterStatus *head = NULL;
+// char fileOps(char);
 
 /* Standard class modifiers */
 union MyClassModifiers
@@ -43,12 +40,22 @@ union MyClassModifiers
 	char cleric[7];
 };
 
-
-/* Standard race modifiers */
-char elf[7] = {2,1,2,0,2,5,14};
-char dwarf[7] = {1,-1,1,2,2,6,14};
-char human[7] = {0,0,0,0,0,6,14};
-char planes[7] = {2,2,0,-2,-2,3,14};
+/* Build a 2D array to hold default race stats.  
+** Standard race modifier array for character stat
+** [0] = Wisdom
+** [1] = Intelligence
+** [2] = Dexterity
+** [3] = Strength
+** [4] = Charisma
+** [5] = Floor
+** [6] = Max
+*/
+char race_modifiers[RACES_INDEX][CHARACTER_STAT_ARR] = { 
+	{2,1,2,0,2,5,14}, // elf
+	{1,-1,1,2,2,6,14}, // dwarf
+	{0,0,0,0,0,6,14}, // human
+	{2,2,0,-2,-2,3,14} // planes
+};
 
 /* Seed the randomizer prototype */
 void randomizer (void);
@@ -62,82 +69,58 @@ struct characterSpecials {
 
 void drawStats (struct characterStats *);
 
-/* Function addRaceModifiers add the standard race modifiers to the character stats as part of the build character process. 
-*  The function takes two parameters.  A pointer to the char race (declared in main) and pointer to the structure characterStats.
-*  The purpose of the function was to ensure that the characterStats were reset with each die roll and the modifiers readded. 
-*  The pointers serve as a means of optimization for the limited 8-bit machines 
-*/
-void addRaceModifiers (byte *, struct characterStats *);
-
 char main (void) {
 
-	byte c;
+	byte c;		// used to capture input from the user
 	
 	char accept[2] = "0";
 		
-	byte race;
 	unsigned char total;
 
-	CHARACTER *thisCharacter;
+	char myCharacter[7];
 
-	/* proto code for characterStats linked list 
-	 struct characterStats *tempCharStats;
-	 tempCharStats = (struct characterStats *)calloc(8, sizeof(struct characterStats));
-	*/
+	printf("Choose a race ([0] elf, [1] dwarf, [2] human, [3] planes) : ");
 
-	/* Removed: malloc, calloc and alloc on the atari platform at it is resource intensive
-	// zero fill the memory space for thisCharacter 
-	// thisCharacter = (CHARACTER *) calloc(7, sizeof(CHARACTER));
-	*/
-
-	// Seed the randomizer 
-	randomizer();
-
-	printf("Generating random stats.\n");
-	printf("Choose a race ( [1] elf, [2] human, [3] dwarf, [4] planes ) : ");
-	scanf("%1i", &race);
-
+	scanf("%1i", &c);
+			
 	while(1) {
+		byte i;
+		byte rolls = 1;
+		byte temp = 0;
+		byte total = 0;
+
+
+		// Set the race modifiers based on race selection
+		for (i = 0; i < CHARACTER_STAT_ARR; i++) {
+			myCharacter[i] = race_modifiers[c][i];
+		}
+
+		for (i = 0; i < CHARACTER_STAT_NUM; i++) {
+			
+			// temp = rand()%myCharacter[6] + myCharacter[5];
+			myCharacter[i] = rollDice(myCharacter, rolls);
+			// myCharacter[i] = temp;
+		}
 		
-		addRaceModifiers(&race, thisCharacter);
-		buildCharacter(thisCharacter);
-
-		total = thisCharacter->wisdom + thisCharacter->intelligence + thisCharacter->dexterity + thisCharacter->strength + thisCharacter->charisma;
-	
-		if (total >= 65) {
-			// printf("Total %i\n", total);
-			printf("Wis : %d\n", thisCharacter->wisdom);
-			printf("Int : %d\n", thisCharacter->intelligence);
-			printf("Dex : %d\n", thisCharacter->dexterity);
-			printf("Str : %d\n", thisCharacter->strength);
-			printf("Cha : %d\n", thisCharacter->charisma);
-
-			printf("Do you accept, reroll or previous? [1] Accept, [2] Reroll, [3] Previous");
+		for (i = 0; i < CHARACTER_STAT_NUM; i++) {
+			total = total + myCharacter[i];
+		}
+		
+		if(total >= 65) {
+			printf("Wis: %d ", myCharacter[0]);
+			printf("Int: %d ", myCharacter[1]);
+			printf("Dex: %d ", myCharacter[2]);
+			printf("Str: %d ", myCharacter[3]);
+			printf("Cha: %d\n\n", myCharacter[4]);
+			printf("Do you accept, reroll or previous? [0] Accept, [1] Reroll, [2] Previous");
 			scanf("%s", accept);
-
-			/*
-			* switch (choice) {
-			* case 1:
-				break;
-			* case 2:
-				;
-			* case 3:
-				printf("Wis : %d\n", thisCharacter->wisdom);
-				printf("Int : %d\n", thisCharacter->intelligence);
-				printf("Dex : %d\n", thisCharacter->dexterity);
-				printf("Str : %d\n", thisCharacter->strength);
-				printf("Cha : %d\n", thisCharacter->charisma);
-				break;
-			*/
-			if (strcmp(accept, "Y") == 0) {
+			if (strcmp(accept, "0") == 0) {
 				printf("Accept == %s \n", accept);
 				break;
 			}
-		// printf("Reroll : %i\n", total);
-
 		}
 	}
-	
+
 	printf("Press any character to exit\n");
 
 	while (1) {
@@ -154,36 +137,6 @@ char main (void) {
 	return 0;
 }
 
-
-void addRaceModifiers (byte *race, struct characterStats *thisCharacter) {
-	switch (*race) {
-		
-		case 1:
-			thisCharacter->wisdom = elf[0];
-			thisCharacter->floor = elf[5];
-			thisCharacter->max = elf[6];
-			break;
-		case 2:
-			thisCharacter->wisdom = dwarf[0];
-			thisCharacter->floor = dwarf[5];
-			thisCharacter->max = dwarf[6];
-			break;
-		case 3:
-			thisCharacter->wisdom = human[0];
-			thisCharacter->floor = human[5];
-			thisCharacter->max = human[6];
-			break;
-		case 4:
-			thisCharacter->wisdom = planes[0];
-			thisCharacter->floor = planes[5];
-			thisCharacter->max = planes[6];
-			break;
-		default:
-			printf("No choice made; assigning human\n");
-			break;
-	}
-}
-
 /* In order to pass by reference a structure to a function you must define the type 'struct' with its tag (or name) and 
 *  then finally the pointer to the instance of the structure you have initialized in main */
 void randomizer (void) {
@@ -198,28 +151,23 @@ void randomizer (void) {
 	
 }
 
-char rollDice (struct characterStats *thisCharacter, char numOfRolls) {
-	unsigned char x = numOfRolls;
-	unsigned char i, final = 0;
-	unsigned char roll;
-	for (i = 0; i < x; i++) {
-		roll = rand()%thisCharacter->max + thisCharacter->floor;
-				
-		if (roll > final) {
+char rollDice (char* localCharacter, byte numOfRolls) {
+	byte localNumOfRolls = numOfRolls;
+	
+	byte i, final = 0, roll;
+	
+	
+	for (i = 0; i < localNumOfRolls; i++) {
+		// Seed the randomizer with each roll ensures that numbers are random per roll and per start of the program.
+		randomizer();
+		roll = rand()%localCharacter[6] + localCharacter[5];
+		printf("roll:%d\n", roll);
+		if (roll >= final) {
+			printf("FR = %i\n", roll);
 			final = roll;
 		}
 	}
 	return final;
-}
-
-void buildCharacter (struct characterStats *thisCharacter) {
-	
-		thisCharacter->wisdom = rollDice(thisCharacter, 1) + thisCharacter->wisdom;
-		thisCharacter->intelligence = rollDice(thisCharacter, 1);
-		thisCharacter->dexterity = rollDice(thisCharacter, 1);
-		thisCharacter->strength = rollDice(thisCharacter, 1);
-		thisCharacter->charisma = rollDice(thisCharacter, 1);
-		
 }
 
 void drawStats (struct characterStats *thisCharacter) {
